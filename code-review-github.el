@@ -343,5 +343,20 @@ https://github.com/wandersoncferreira/code-review#configuration"))
             :errorback (lambda (e &rest _)
                          (message "ERROR!! %S" (a-get (-fourth-item e) 'message)))))
 
+(defun code-review-EXPERIMENTAL-commit-check (owner repo commit-sha)
+  "Get check for COMMIT-SHA given an OWNER and REPO."
+  (let ((res (ghub-get (format "/repos/%s/%s/commits/%s/check-runs"
+                               owner
+                               repo
+                               commit-sha)
+                       nil
+                       :auth 'code-review)))
+    (-map
+     (lambda (it)
+       `((name . ,(a-get it 'name))
+         (status . ,(a-get it 'status))
+         (conclusion . ,(a-get it 'conclusion))))
+     (a-get res 'check_runs))))
+
 (provide 'code-review-github)
 ;;; code-review-github.el ends here
